@@ -1,0 +1,44 @@
+#!/usr/bin/env zsh
+# See LICENSE file for copyright and license details
+
+vars+=(codename)
+codename="kawai" && source "$R/../${codename}.config"
+
+blend_preinst() {
+	fn blend_preinst
+	req=()
+	ckreq || return 1
+}
+
+blend_postinst() {
+	fn blend_postinst
+	req=()
+	ckreq || return 1
+}
+
+blend_bootstrap_setup() {
+	fn blend_bootstrap_setup
+	req=(repo_key strapdir)
+	ckreq || return 1
+
+	cat <<EOF | sudo tee ${strapdir}/blend-bootstrap-setup >/dev/null
+#!/bin/sh
+echo " * Adding maemo repository key to apt..."
+wget -O- ${repo_key} | apt-key add -
+EOF
+	chroot-script -d blend-bootstrap-setup || zerr
+}
+
+conf_print_sourceslist() {
+	fn conf_print_sourceslist "(override)"
+	req=(codename device_name)
+	ckreq || return 1
+
+	cat <<EOF
+deb http://pkgmaster.devuan.org/merged ascii main contrib non-free
+deb http://pkgmaster.devuan.org/merged ascii-updates main contrib non-free
+deb http://pkgmaster.devuan.org/merged ascii-security main contrib non-free
+
+deb http://maedevu.maemo.org/${codename} ${codename} main contrib non-free ${device_name}
+EOF
+}

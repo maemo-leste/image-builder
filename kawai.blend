@@ -17,7 +17,7 @@ blend_postinst() {
 
 	notice "copying rootfs overlay"
 	sudo rsync -vraX "$R/../rootfs-overlay/common/" "${strapdir}"
-	sudo rsync -vraX "$R/../rootfs-overlay/${device_name}" "${strapdir}"
+	sudo rsync -vraX "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
 }
 
 blend_bootstrap_setup() {

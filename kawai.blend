@@ -12,8 +12,12 @@ blend_preinst() {
 
 blend_postinst() {
 	fn blend_postinst
-	req=()
+	req=(device_name strapdir)
 	ckreq || return 1
+
+	notice "copying rootfs overlay"
+	sudo rsync -vraX "$R/../rootfs-overlay/common/" "${strapdir}"
+	sudo rsync -vraX "$R/../rootfs-overlay/${device_name}" "${strapdir}"
 }
 
 blend_bootstrap_setup() {

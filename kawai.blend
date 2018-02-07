@@ -21,6 +21,8 @@ blend_postinst() {
 
 	[ -n "$armsdk_version" ] && \
 		sudo rsync -vraX "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
+
+	return 0
 }
 
 blend_bootstrap_setup() {

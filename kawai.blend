@@ -12,12 +12,15 @@ blend_preinst() {
 
 blend_postinst() {
 	fn blend_postinst
-	req=(device_name strapdir)
+	req=(strapdir)
+	[ -n "$armsdk_version" ] && req+=(device_name)
 	ckreq || return 1
 
-	notice "copying rootfs overlay"
+	notice "copying rootfs overlays"
 	sudo rsync -vraX "$R/../rootfs-overlay/common/" "${strapdir}"
-	sudo rsync -vraX "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
+
+	[ -n "$armsdk_version" ] && \
+		sudo rsync -vraX "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
 }
 
 blend_bootstrap_setup() {
@@ -35,7 +38,8 @@ EOF
 
 conf_print_sourceslist() {
 	fn conf_print_sourceslist "(override)"
-	req=(codename device_name)
+	req=(codename)
+	[ -n "$armsdk_version" ] && req+=(device_name)
 	ckreq || return 1
 
 	cat <<EOF

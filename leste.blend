@@ -22,7 +22,38 @@ blend_postinst() {
 	[ -n "$armsdk_version" ] && \
 		sudo rsync -vraX "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
 
+	case "$device_name" in
+		droid4)
+			cat <<EOF | sudo tee ${strapdir}/droid4-finalize >/dev/null
+#!/bin/sh
+rc-update add droid4-lcd sysinit
+EOF
+			chroot-script -d droid4-finalize || zerr
+			;;
+	esac
+
+	blend_finalize || zerr
+
 	return 0
+}
+
+blend_finalize() {
+	fn blend_finalize
+	req=(strapdir)
+	ckreq || return 1
+
+	notice "Finalizing installation"
+	cat <<EOF | sudo tee ${strapdir}/blend-finalize >/dev/null
+#!/bin/sh
+
+apt-get --yes --force-yes purge ${finalize_purge_packages}
+apt-get --yes --force-yes --purge autoremove
+
+apt-get update
+apt-get clean
+updatedb
+EOF
+	chroot-script -d blend-finalize || zerr
 }
 
 blend_bootstrap_setup() {

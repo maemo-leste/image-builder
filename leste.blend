@@ -4,6 +4,17 @@
 vars+=(codename)
 codename="leste" && source "$R/../${codename}.config"
 
+case "$device_name" in
+	n900)
+		build_kernel_${arch}() {
+			fn build_kernel_${arch} "(override)"
+			#prebuild || zerr
+			postbuild || zerr
+			copy-root-overlay || zerr
+		}
+		;;
+esac
+
 blend_preinst() {
 	fn blend_preinst
 	req=()

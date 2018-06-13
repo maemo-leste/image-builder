@@ -60,6 +60,8 @@ blend_finalize() {
 sed 's/^allowed_users=.*/allowed_users=anybody/' -i /etc/X11/Xwrapper.config
 echo "needs_root_rights=yes" >> /etc/X11/Xwrapper.config
 
+sed 's/^UsePAM .*/UsePAM yes/' -i /etc/ssh/sshd_config
+
 apt-get --yes --force-yes purge ${finalize_purge_packages}
 apt-get --yes --force-yes --purge autoremove
 dpkg -l | awk '/^rc / {print $2}' | xargs apt-get --yes --force-yes purge

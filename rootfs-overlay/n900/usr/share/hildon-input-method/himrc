@@ -1,0 +1,164 @@
+# Copyright Nokia Corporation 2007
+# Licensed under Creative Commons Attribution-ShareAlike 2.5 license
+
+##############################
+# Hildon Input Method
+##############################
+
+# Special Character View
+
+style "scv-button" {
+        GtkButton::child_spacing = 0
+
+        engine "pixmap" {
+                image {
+                        function = BOX
+                        state = ACTIVE
+                        file = "SCVButtonPressed.png"
+                        border = { 16, 16, 0, 0 }
+                }
+                image {
+                        function = BOX
+                        state = INSENSITIVE
+                        file = "SCVButtonDisabled.png"
+                        border = { 16, 16, 0, 0 }
+                }
+                image {
+                        function = BOX
+                        file = "SCVButtonNormal.png"
+                        border = { 16, 16, 0, 0 }
+                }
+        }
+}
+widget "*hildon-scv-button" style "scv-button"
+
+style "scv-tab-button" {
+        GtkButton::child_spacing = 0
+
+        engine "pixmap" {
+                image {
+                        function = BOX
+                        state = ACTIVE
+                        file = "SCVTabButtonPressed.png"
+                        border = { 16, 16, 0, 0 }
+                }
+                image {
+                        function = BOX
+                        state = INSENSITIVE
+                        file = "SCVTabButtonDisabled.png"
+                        border = { 16, 16, 0, 0 }
+                }
+                image {
+                        function = BOX
+                        file = "SCVTabButtonNormal.png"
+                        border = { 16, 16, 0, 0 }
+                }
+        }
+}
+widget "*hildon-scv-tab-button" style "scv-tab-button"
+
+
+# Virtual Finger Keyboard
+
+style "vkb-button" {
+        GtkButton::child_spacing = 0
+
+        engine "pixmap" {
+                image {
+                        function = BOX
+                        state = ACTIVE
+                        file = "InputMethodButtonPressed.png"
+                        border = { 16, 16, 0, 0 }
+                }
+                image {
+                        function = BOX
+                        state = INSENSITIVE
+                        file = "InputMethodButtonDisabled.png"
+                        border = { 16, 16, 0, 0 }
+                }
+                image {
+                        function = BOX
+                        file = "InputMethodButtonNormal.png"
+                        border = { 16, 16, 0, 0 }
+                }
+        }
+}
+widget "*hildon-im-button" style "vkb-button"
+
+style "vkb-alt-button" {
+        GtkButton::child_spacing = 0
+
+        engine "pixmap" {
+                image {
+                        function = BOX
+                        state = ACTIVE
+                        file = "InputMethodButtonPressed.png"
+                        border = { 16, 16, 0, 0 }
+                }
+                image {
+                        function = BOX
+                        state = INSENSITIVE
+                        file = "InputMethodButtonDisabled.png"
+                        border = { 16, 16, 0, 0 }
+                }
+                image {
+                        function = BOX
+                        file = "InputMethodAltButtonNormal.png"
+                        border = { 16, 16, 0, 0 }
+                }
+        }
+}
+widget "*hildon-im-alt-button" style "vkb-alt-button"
+
+style "vkb-shift-button" {
+        GtkButton::child_spacing = 0
+
+        engine "pixmap" {
+                image {
+                        function = BOX
+                        state = ACTIVE
+                        file = "InputMethodShiftButtonPressed.png"
+                        border = { 0, 0, 0, 0 }
+                }
+                image {
+                        function = BOX
+                        file = "InputMethodShiftButtonNormal.png"
+                        border = { 0, 0, 0, 0 }
+                }
+        }
+}
+widget "*hildon-im-shift-button" style "vkb-shift-button"
+
+style "vkb-backspace-button" {
+        GtkButton::child_spacing = 0
+
+        engine "pixmap" {
+                image {
+                        function = BOX
+                        state = ACTIVE
+                        file = "InputMethodBackspaceButtonPressed.png"
+                        border = { 0, 0, 0, 0 }
+                }
+                image {
+                        function = BOX
+                        file = "InputMethodBackspaceButtonNormal.png"
+                        border = { 0, 0, 0, 0 }
+                }
+        }
+}
+widget "*hildon-im-backspace-button" style "vkb-backspace-button"
+
+style "vkb-dialog-background" {
+        engine "pixmap" {
+                image {
+                        function = FLAT_BOX
+                        file = "wmDialog.png"
+                        border = {16, 16, 46, 0}
+                }
+        }
+}
+widget "osso-im-fkb-window" style "vkb-dialog-background"
+
+widget "*.osso-im-fkb-renderer" style "X-LargeSystemFont"
+
+widget "*.osso-im-scv-renderer" style "X-LargeSystemFont"

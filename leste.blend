@@ -30,8 +30,10 @@ blend_postinst() {
 	notice "copying rootfs overlays"
 	sudo rsync -vraX "$R/../rootfs-overlay/common/" "${strapdir}"
 
-	[ -n "$armsdk_version" ] && \
+	if [ -n "$armsdk_version" ]; then
 		sudo rsync -vraX "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
+		print "devuan-${device_name}" | sudo tee "$strapdir/etc/hostname" >/dev/null
+	fi
 
 	case "$device_name" in
 		droid4)

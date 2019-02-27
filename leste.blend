@@ -40,6 +40,7 @@ blend_postinst() {
 			cat <<EOF | sudo tee ${strapdir}/droid4-finalize >/dev/null
 #!/bin/sh
 rc-update add droid4-lcd sysinit
+sed -e 's/^LABEL=.*/LABEL=Maemo Leste/' -i /boot/boot/boot.cfg
 EOF
 			chroot-script -d droid4-finalize || zerr
 			;;

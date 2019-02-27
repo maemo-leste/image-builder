@@ -28,10 +28,10 @@ blend_postinst() {
 	ckreq || return 1
 
 	notice "copying rootfs overlays"
-	sudo rsync -vraX "$R/../rootfs-overlay/common/" "${strapdir}"
+	sudo rsync -vraX --chown=root:root "$R/../rootfs-overlay/common/" "${strapdir}"
 
 	if [ -n "$armsdk_version" ]; then
-		sudo rsync -vraX "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
+		sudo rsync -vraX --chown=root:root "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
 		print "devuan-${device_name}" | sudo tee "$strapdir/etc/hostname" >/dev/null
 	fi
 

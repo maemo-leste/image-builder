@@ -33,6 +33,7 @@ blend_postinst() {
 	if [ -n "$armsdk_version" ]; then
 		sudo rsync -vraX --chown=root:root "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
 		print "devuan-${device_name}" | sudo tee "$strapdir/etc/hostname" >/dev/null
+		sudo sed -e "s/devuan/devuan-${device_name}/" -i "$strapdir/etc/hosts"
 	fi
 
 	case "$device_name" in

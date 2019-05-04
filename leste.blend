@@ -70,6 +70,8 @@ apt-get --yes --force-yes purge ${finalize_purge_packages}
 apt-get --yes --force-yes --purge autoremove
 dpkg -l | awk '/^rc / {print $2}' | xargs apt-get --yes --force-yes purge
 
+chown -R user:user /home/user
+
 apt-get update
 apt-get clean
 updatedb

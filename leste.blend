@@ -111,4 +111,8 @@ EOF
 deb http://pkgmaster.devuan.org/merged ascii-backports main contrib non-free
 EOF
 	fi
+
+	if [[ "$device_name" = "pinephone-dontbeevil" ]]; then
+		sudo sed 's/-dontbeevil//' -i "$strapdir/etc/apt/sources.list"
+	fi
 }

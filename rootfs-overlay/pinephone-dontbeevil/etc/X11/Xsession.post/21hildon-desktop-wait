@@ -1,0 +1,11 @@
+#!/bin/sh
+
+while [ ! -e /tmp/hildon-desktop/desktop-started.stamp ]
+do
+        sleep 0.25
+        xrandr --output DSI-1 --rotate right
+done
+
+sleep 5
+dbus-send --system --type=signal /com/nokia/HildonDesktop/ready \
+        com.nokia.HildonDesktop.ready

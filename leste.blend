@@ -106,6 +106,12 @@ deb http://pkgmaster.devuan.org/merged ascii-security main contrib non-free
 deb http://maedevu.maemo.org/${codename} ${codename} main contrib non-free ${device_name} ${lima}
 EOF
 
+	if [[ "$devel_image" = true ]]; then
+		cat <<EOF
+deb http://maedevu.maemo.org/${codename}-devel ${codename}-devel main contrib non-free ${device_name} ${lima}
+EOF
+	fi
+
 	if [[ -n "$lima" ]]; then
 		cat <<EOF
 deb http://pkgmaster.devuan.org/merged ascii-backports main contrib non-free

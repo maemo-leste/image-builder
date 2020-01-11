@@ -1,0 +1,7 @@
+SUBSYSTEMS=="motmdm", GROUP="dialout", MODE="0664"
+SUBSYSTEMS=="gnss", GROUP="root", MODE="0644"
+
+KERNEL=="ttyUSB4", ENV{OFONO_DRIVER}="g1"
+KERNEL=="motmdm1", ENV{OFONO_DRIVER}="motmdm"
+
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="22b8", ATTRS{idProduct}=="2a70", TEST=="power/control" ATTR{power/control}="auto"

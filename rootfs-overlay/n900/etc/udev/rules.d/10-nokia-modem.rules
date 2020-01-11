@@ -1,0 +1,6 @@
+# Export GPIOs for nokia-modem
+DRIVER=="nokia-modem", RUN+="/bin/ln -sf /sys/bus/hsi/devices/n900-modem /dev/cmt"
+
+# Tag modem device for ofono
+SUBSYSTEMS=="hsi", ENV{OFONO_DRIVER}="n900", ENV{OFONO_ISI_ADDRESS}="108"
+KERNEL=="phonet*", ENV{OFONO_DRIVER}="n900", ENV{OFONO_ISI_ADDRESS}="108"

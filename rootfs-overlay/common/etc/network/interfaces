@@ -9,11 +9,5 @@
 auto lo
 iface lo inet loopback
 
-allow-hotplug usb0
-iface usb0 inet static
-	address 192.168.42.2
-	netmask 255.255.255.0
-	gateway 192.168.42.1
-
 allow-hotplug wlan0
 iface wlan0 inet manual

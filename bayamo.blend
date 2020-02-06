@@ -1,0 +1,125 @@
+#!/usr/bin/env zsh
+# See LICENSE file for copyright and license details
+
+vars+=(codename)
+codename="bayamo" && source "$R/../${codename}.config"
+
+case "$device_name" in
+	n900|droid4|pinephone-dontbeevil)
+		build_kernel_${arch}() {
+			fn build_kernel_${arch} "(override)"
+			#prebuild || zerr
+			postbuild || zerr
+			copy-root-overlay || zerr
+		}
+		;;
+esac
+
+blend_preinst() {
+	fn blend_preinst
+	req=()
+	ckreq || return 1
+}
+
+blend_postinst() {
+	fn blend_postinst
+	req=(strapdir)
+	[ -n "$armsdk_version" ] && req+=(device_name)
+	ckreq || return 1
+
+	notice "copying rootfs overlays"
+	sudo rsync -vraX --chown=root:root "$R/../rootfs-overlay/common/" "${strapdir}"
+
+	if [ -n "$armsdk_version" ]; then
+		sudo rsync -vraX --chown=root:root "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
+		print "devuan-${device_name}" | sudo tee "$strapdir/etc/hostname" >/dev/null
+		sudo sed -e "s/devuan/devuan-${device_name}/" -i "$strapdir/etc/hosts"
+	fi
+
+	case "$device_name" in
+		droid4)
+			cat <<EOF | sudo tee ${strapdir}/droid4-finalize >/dev/null
+#!/bin/sh
+rc-update add droid4-lcd sysinit
+sed -e 's/^LABEL=.*/LABEL=Maemo Leste/' -i /boot/boot/boot.cfg
+EOF
+			chroot-script -d droid4-finalize || zerr
+			;;
+	esac
+
+	blend_finalize || zerr
+
+	return 0
+}
+
+blend_finalize() {
+	fn blend_finalize
+	req=(strapdir)
+	ckreq || return 1
+
+	notice "Finalizing installation"
+	cat <<EOF | sudo tee ${strapdir}/blend-finalize >/dev/null
+#!/bin/sh
+
+sed 's/^allowed_users=.*/allowed_users=anybody/' -i /etc/X11/Xwrapper.config
+echo "needs_root_rights=yes" >> /etc/X11/Xwrapper.config
+
+sed 's/^UsePAM .*/UsePAM yes/' -i /etc/ssh/sshd_config
+
+apt-get --yes --force-yes purge ${finalize_purge_packages}
+apt-get --yes --force-yes --purge autoremove
+dpkg -l | awk '/^rc / {print $2}' | xargs apt-get --yes --force-yes purge
+
+chown -R user:user /home/user
+
+apt-get update
+apt-get clean
+updatedb
+EOF
+	chroot-script -d blend-finalize || zerr
+}
+
+blend_bootstrap_setup() {
+	fn blend_bootstrap_setup
+	req=(repo_key strapdir)
+	ckreq || return 1
+
+	cat <<EOF | sudo tee ${strapdir}/blend-bootstrap-setup >/dev/null
+#!/bin/sh
+echo " * Adding maemo repository key to apt..."
+apt --yes --force-yes install wget gnupg
+wget -O- ${repo_key} | apt-key add -
+EOF
+	chroot-script -d blend-bootstrap-setup || zerr
+}
+
+conf_print_sourceslist() {
+	fn conf_print_sourceslist "(override)"
+	req=(codename)
+	[ -n "$armsdk_version" ] && req+=(device_name)
+	ckreq || return 1
+
+	cat <<EOF
+deb http://pkgmaster.devuan.org/merged ${release} main contrib non-free
+deb http://pkgmaster.devuan.org/merged ${release}-updates main contrib non-free
+deb http://pkgmaster.devuan.org/merged ${release}-security main contrib non-free
+
+deb http://maedevu.maemo.org/${codename} ${codename} main contrib non-free ${device_name} ${lima}
+EOF
+
+	if [[ "$devel_image" = true ]]; then
+		cat <<EOF
+deb http://maedevu.maemo.org/${codename}-devel ${codename}-devel main contrib non-free ${device_name} ${lima}
+EOF
+	fi
+
+	if [[ -n "$lima" ]]; then
+		cat <<EOF
+deb http://pkgmaster.devuan.org/merged ${release}-backports main contrib non-free
+EOF
+	fi
+
+	if [[ "$device_name" = "pinephone-dontbeevil" ]]; then
+		sudo sed 's/-dontbeevil//' -i "$strapdir/etc/apt/sources.list"
+	fi
+}

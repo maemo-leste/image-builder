@@ -5,7 +5,7 @@ vars+=(codename)
 codename="leste" && source "$R/../${codename}.config"
 
 case "$device_name" in
-	n900|droid4)
+	n900|droid4|pinephone*|pinetab)
 		build_kernel_${arch}() {
 			fn build_kernel_${arch} "(override)"
 			#prebuild || zerr
@@ -120,5 +120,9 @@ EOF
 
 	if [[ "$device_name" = "pinephone-dontbeevil" ]]; then
 		sudo sed 's/-dontbeevil//' -i "$strapdir/etc/apt/sources.list"
+	fi
+
+	if [[ "$device_name" = "pinetab" ]]; then
+		sudo sed 's/pinetab/pinephone/' -i "$strapdir/etc/apt/sources.list"
 	fi
 }

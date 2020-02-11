@@ -99,9 +99,9 @@ conf_print_sourceslist() {
 	ckreq || return 1
 
 	cat <<EOF
-deb http://pkgmaster.devuan.org/merged ascii main contrib non-free
-deb http://pkgmaster.devuan.org/merged ascii-updates main contrib non-free
-deb http://pkgmaster.devuan.org/merged ascii-security main contrib non-free
+deb http://pkgmaster.devuan.org/merged ${release} main contrib non-free
+deb http://pkgmaster.devuan.org/merged ${release}-updates main contrib non-free
+deb http://pkgmaster.devuan.org/merged ${release}-security main contrib non-free
 
 deb http://maedevu.maemo.org/${codename} ${codename} main contrib non-free ${device_name} ${lima}
 EOF
@@ -112,9 +112,9 @@ deb http://maedevu.maemo.org/${codename}-devel ${codename}-devel main contrib no
 EOF
 	fi
 
-	if [[ -n "$lima" ]]; then
+	if [[ -n "$lima" ]] && [[ "$release" = "ascii" ]]; then
 		cat <<EOF
-deb http://pkgmaster.devuan.org/merged ascii-backports main contrib non-free
+deb http://pkgmaster.devuan.org/merged ${release}-backports main contrib non-free
 EOF
 	fi
 

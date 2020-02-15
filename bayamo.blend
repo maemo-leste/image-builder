@@ -72,6 +72,14 @@ dpkg -l | awk '/^rc / {print $2}' | xargs apt-get --yes --force-yes purge
 
 chown -R user:user /home/user
 
+cd /etc/runlevels
+for i in *; do
+	if [ -L "\$i" ]; then
+		mv "\$i" default
+	fi
+done
+cd - >/dev/null
+
 apt-get update
 apt-get clean
 updatedb

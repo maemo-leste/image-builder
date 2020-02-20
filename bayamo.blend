@@ -112,12 +112,12 @@ deb http://pkgmaster.devuan.org/merged ${release} main contrib non-free
 deb http://pkgmaster.devuan.org/merged ${release}-updates main contrib non-free
 deb http://pkgmaster.devuan.org/merged ${release}-security main contrib non-free
 
-deb http://maedevu.maemo.org/${codename} ${codename} main contrib non-free ${device_name} ${lima}
+deb http://maedevu.maemo.org/${codename} ${release} main contrib non-free ${device_name} ${lima}
 EOF
 
 	if [[ "$devel_image" = true ]]; then
 		cat <<EOF
-deb http://maedevu.maemo.org/${codename}-devel ${codename}-devel main contrib non-free ${device_name} ${lima}
+deb http://maedevu.maemo.org/${codename} ${release}-devel main contrib non-free ${device_name} ${lima}
 EOF
 	fi
 

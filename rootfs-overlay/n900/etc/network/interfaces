@@ -1,5 +1,0 @@
-auto lo
-iface lo inet loopback
-
-allow-hotplug wlan0
-iface wlan0 inet manual

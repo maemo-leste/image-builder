@@ -73,19 +73,6 @@ EOF
 	chroot-script -d blend-finalize || zerr
 }
 
-blend_bootstrap_setup() {
-	fn blend_bootstrap_setup
-	req=(repo_key strapdir)
-	ckreq || return 1
-
-	cat <<EOF | sudo tee ${strapdir}/blend-bootstrap-setup >/dev/null
-#!/bin/sh
-echo " * Adding maemo repository key to apt..."
-wget -O- ${repo_key} | apt-key add -
-EOF
-	chroot-script -d blend-bootstrap-setup || zerr
-}
-
 conf_print_sourceslist() {
 	fn conf_print_sourceslist "(override)"
 	req=(codename)

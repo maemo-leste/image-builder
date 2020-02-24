@@ -2,10 +2,10 @@
 # See LICENSE file for copyright and license details
 
 vars+=(codename)
-codename="bayamo" && source "$R/../${codename}.config"
+codename="leste" && source "$R/../bayamo.config"
 
 case "$device_name" in
-	n900|droid4|pinephone-dontbeevil)
+	n900|droid4|pinephone*|pinetab)
 		build_kernel_${arch}() {
 			fn build_kernel_${arch} "(override)"
 			#prebuild || zerr
@@ -14,12 +14,6 @@ case "$device_name" in
 		}
 		;;
 esac
-
-blend_preinst() {
-	fn blend_preinst
-	req=()
-	ckreq || return 1
-}
 
 blend_postinst() {
 	fn blend_postinst
@@ -121,13 +115,11 @@ deb http://maedevu.maemo.org/${codename} ${release}-devel main contrib non-free 
 EOF
 	fi
 
-	if [[ -n "$lima" ]]; then
-		cat <<EOF
-deb http://pkgmaster.devuan.org/merged ${release}-backports main contrib non-free
-EOF
-	fi
-
 	if [[ "$device_name" = "pinephone-dontbeevil" ]]; then
 		sudo sed 's/-dontbeevil//' -i "$strapdir/etc/apt/sources.list"
+	fi
+
+	if [[ "$device_name" = "pinetab" ]]; then
+		sudo sed 's/pinetab/pinephone/' -i "$strapdir/etc/apt/sources.list"
 	fi
 }

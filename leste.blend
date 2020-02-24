@@ -15,12 +15,6 @@ case "$device_name" in
 		;;
 esac
 
-blend_preinst() {
-	fn blend_preinst
-	req=()
-	ckreq || return 1
-}
-
 blend_postinst() {
 	fn blend_postinst
 	req=(strapdir)

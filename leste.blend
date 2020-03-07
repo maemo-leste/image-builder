@@ -64,6 +64,13 @@ apt-get --yes --force-yes purge ${finalize_purge_packages}
 apt-get --yes --force-yes --purge autoremove
 dpkg -l | awk '/^rc / {print $2}' | xargs apt-get --yes --force-yes purge
 
+# Generate locales
+apt-cache search hildon-common-strings-l10n \
+	| grep -v mr0 \
+	| awk -F'[()]' '{printf "%s.UTF-8 UTF-8\n", \$2}' \
+	>> /etc/locale.gen
+locale-gen
+
 chown -R user:user /home/user
 
 apt-get update

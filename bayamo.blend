@@ -66,6 +66,13 @@ dpkg -l | awk '/^rc / {print $2}' | xargs apt-get --yes --force-yes purge
 
 chown -R user:user /home/user
 
+# Generate locales
+apt-cache search hildon-common-strings-l10n \
+	| grep -v mr0 \
+	| awk -F'[()]' '{printf "%s.UTF-8 UTF-8\n", \$2}' \
+	>> /etc/locale.gen
+locale-gen
+
 cd /etc/runlevels
 for i in *; do
 	if [ -L "\$i" ]; then

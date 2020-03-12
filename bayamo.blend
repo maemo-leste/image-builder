@@ -103,25 +103,24 @@ conf_print_sourceslist() {
 	[ -n "$armsdk_version" ] && req+=(device_name)
 	ckreq || return 1
 
-	cat <<EOF
-deb http://pkgmaster.devuan.org/merged ${release} main contrib non-free
-deb http://pkgmaster.devuan.org/merged ${release}-updates main contrib non-free
-deb http://pkgmaster.devuan.org/merged ${release}-security main contrib non-free
+	devname="$device_name"
+	case "$device_name" in
+	pine*)
+		devname="pinephone"
+		;;
+	esac
 
-deb http://maedevu.maemo.org/${codename} ${release} main contrib non-free ${device_name} ${lima}
+	cat <<EOF
+deb https://pkgmaster.devuan.org/merged ${release} main contrib non-free
+deb https://pkgmaster.devuan.org/merged ${release}-updates main contrib non-free
+deb https://pkgmaster.devuan.org/merged ${release}-security main contrib non-free
+
+deb https://maedevu.maemo.org/${codename} ${release} main contrib non-free ${lima} ${devname}
 EOF
 
 	if [[ "$devel_image" = true ]]; then
 		cat <<EOF
-deb http://maedevu.maemo.org/${codename} ${release}-devel main contrib non-free ${device_name} ${lima}
+deb https://maedevu.maemo.org/${codename} ${release}-devel main contrib non-free ${lima} ${devname}
 EOF
-	fi
-
-	if [[ "$device_name" = "pinephone-dontbeevil" ]]; then
-		sudo sed 's/-dontbeevil//' -i "$strapdir/etc/apt/sources.list"
-	fi
-
-	if [[ "$device_name" = "pinetab" ]]; then
-		sudo sed 's/pinetab/pinephone/' -i "$strapdir/etc/apt/sources.list"
 	fi
 }

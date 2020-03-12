@@ -5,14 +5,14 @@ vars+=(codename)
 codename="leste" && source "$R/../bayamo.config"
 
 case "$device_name" in
-	n900|droid4|pinephone*|pinetab)
-		build_kernel_${arch}() {
-			fn build_kernel_${arch} "(override)"
-			#prebuild || zerr
-			postbuild || zerr
-			copy-root-overlay || zerr
-		}
-		;;
+n900|droid4|pine*)
+	build_kernel_${arch}() {
+		fn build_kernel_${arch} "(override)"
+		#prebuild || zerr
+		postbuild || zerr
+		copy-root-overlay || zerr
+	}
+	;;
 esac
 
 blend_bootstrap_setup() {
@@ -33,27 +33,27 @@ EOF
 blend_postinst() {
 	fn blend_postinst
 	req=(strapdir)
-	[ -n "$armsdk_version" ] && req+=(device_name)
+	[[ -n "$armsdk_version" ]] && req+=(device_name)
 	ckreq || return 1
 
 	notice "copying rootfs overlays"
 	sudo rsync -vraX --chown=root:root "$R/../rootfs-overlay/common/" "${strapdir}"
 
-	if [ -n "$armsdk_version" ]; then
+	if [[ -n "$armsdk_version" ]]; then
 		sudo rsync -vraX --chown=root:root "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
-		print "devuan-${device_name}" | sudo tee "$strapdir/etc/hostname" >/dev/null
+		echo "devuan-${device_name}" | sudo tee "$strapdir/etc/hostname" >/dev/null
 		sudo sed -e "s/devuan/devuan-${device_name}/" -i "$strapdir/etc/hosts"
 	fi
 
 	case "$device_name" in
-		droid4)
-			cat <<EOF | sudo tee ${strapdir}/droid4-finalize >/dev/null
+	droid4)
+		cat <<EOF | sudo tee ${strapdir}/droid4-finalize >/dev/null
 #!/bin/sh
 rc-update add droid4-lcd sysinit
 sed -e 's/^LABEL=.*/LABEL=Maemo Leste/' -i /boot/boot/boot.cfg
 EOF
-			chroot-script -d droid4-finalize || zerr
-			;;
+		chroot-script -d droid4-finalize || zerr
+		;;
 	esac
 
 	blend_finalize || zerr
@@ -100,7 +100,7 @@ EOF
 conf_print_sourceslist() {
 	fn conf_print_sourceslist "(override)"
 	req=(codename)
-	[ -n "$armsdk_version" ] && req+=(device_name)
+	[[ -n "$armsdk_version" ]] && req+=(device_name)
 	ckreq || return 1
 
 	devname="$device_name"

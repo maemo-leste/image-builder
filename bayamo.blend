@@ -70,16 +70,9 @@ blend_finalize() {
 	cat <<EOF | sudo tee ${strapdir}/blend-finalize >/dev/null
 #!/bin/sh
 
-sed 's/^allowed_users=.*/allowed_users=anybody/' -i /etc/X11/Xwrapper.config
-echo "needs_root_rights=yes" >> /etc/X11/Xwrapper.config
-
-sed 's/^UsePAM .*/UsePAM yes/' -i /etc/ssh/sshd_config
-
 apt-get --yes --force-yes purge ${finalize_purge_packages}
 apt-get --yes --force-yes --purge autoremove
-dpkg -l | awk '/^rc / {print $2}' | xargs apt-get --yes --force-yes purge
-
-chown -R user:user /home/user
+dpkg -l | awk '/^rc / {print \$2}' | xargs apt-get --yes --force-yes purge
 
 # TODO: Do this through a package when we have a language-changing package
 # Generate locales
@@ -95,11 +88,11 @@ for i in *; do
 		mv "\$i" default
 	fi
 done
-cd - >/dev/null
 
 apt-get update
 apt-get clean
 updatedb
+update-ca-certificates
 EOF
 	chroot-script -d blend-finalize || zerr
 }

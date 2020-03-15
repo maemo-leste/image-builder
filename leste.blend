@@ -5,7 +5,7 @@ vars+=(codename)
 codename="leste" && source "$R/../${codename}.config"
 
 case "$device_name" in
-	n900|droid4|pinephone*|pinetab)
+	n900|droid4|pinephone-dontbeevil|pinetab)
 		build_kernel_${arch}() {
 			fn build_kernel_${arch} "(override)"
 			#prebuild || zerr

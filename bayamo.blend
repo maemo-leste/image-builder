@@ -43,6 +43,11 @@ blend_postinst() {
 		sudo rsync -vraX --chown=root:root "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
 		echo "devuan-${device_name}" | sudo tee "$strapdir/etc/hostname" >/dev/null
 		sudo sed -e "s/devuan/devuan-${device_name}/" -i "$strapdir/etc/hosts"
+		cat <<EOF | sudo tee "$strapdir/etc/fstab" >/dev/null
+# fstab for arm system
+none /sys/kernel/debug debugfs defaults 0 0
+/dev/mmcblk0p1 /boot ${bootfs} defaults 0 1
+EOF
 	fi
 
 	case "$device_name" in

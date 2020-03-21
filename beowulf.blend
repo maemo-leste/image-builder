@@ -86,6 +86,7 @@ apt-cache search hildon-common-strings-l10n \
 	| awk -F'[()]' '{printf "%s.UTF-8 UTF-8\n", \$2}' \
 	>> /etc/locale.gen
 locale-gen
+setlocale en_US en_US
 
 cd /etc/runlevels
 for i in *; do

@@ -88,6 +88,9 @@ apt-cache search hildon-common-strings-l10n \
 locale-gen
 setlocale en_US en_US
 
+gconftool-2 -s /apps/osso/inputmethod/use_finger_kb -t bool true
+#gconftool-2 -s /syste/osso/af/slide-open -t bool true
+
 cd /etc/runlevels
 for i in *; do
 	if [ -L "\$i" ]; then

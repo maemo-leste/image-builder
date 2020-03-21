@@ -2,7 +2,7 @@
 # See LICENSE file for copyright and license details
 
 vars+=(codename)
-codename="leste" && source "$R/../bayamo.config"
+codename="leste" && source "$R/../beowulf.config"
 
 case "$device_name" in
 n900|droid4|pine*)

@@ -86,7 +86,7 @@ apt-cache search hildon-common-strings-l10n \
 	| awk -F'[()]' '{printf "%s.UTF-8 UTF-8\n", \$2}' \
 	>> /etc/locale.gen
 locale-gen
-setlocale en_US en_US
+setlocale en_US.utf-8 en_US.utf-8
 
 gconftool-2 -s /apps/osso/inputmethod/use_finger_kb -t bool true
 #gconftool-2 -s /syste/osso/af/slide-open -t bool true

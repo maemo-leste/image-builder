@@ -117,6 +117,9 @@ conf_print_sourceslist() {
 	pine*)
 		devname="pinephone"
 		;;
+	raspi*)
+		devname="raspberrypi"
+		;;
 	esac
 
 	cat <<EOF

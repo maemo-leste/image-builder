@@ -2,7 +2,7 @@
 # See LICENSE file for copyright and license details
 
 vars+=(codename)
-codename="leste" && source "$R/../bayamo.config"
+codename="leste" && source "$R/../beowulf.config"
 
 case "$device_name" in
 n900|droid4|pine*)
@@ -43,6 +43,11 @@ blend_postinst() {
 		sudo rsync -vraX --chown=root:root "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
 		echo "devuan-${device_name}" | sudo tee "$strapdir/etc/hostname" >/dev/null
 		sudo sed -e "s/devuan/devuan-${device_name}/" -i "$strapdir/etc/hosts"
+		cat <<EOF | sudo tee "$strapdir/etc/fstab" >/dev/null
+# fstab for arm system
+none /sys/kernel/debug debugfs defaults 0 0
+/dev/mmcblk0p1 /boot ${bootfs} defaults 0 1
+EOF
 	fi
 
 	case "$device_name" in
@@ -81,6 +86,10 @@ apt-cache search hildon-common-strings-l10n \
 	| awk -F'[()]' '{printf "%s.UTF-8 UTF-8\n", \$2}' \
 	>> /etc/locale.gen
 locale-gen
+setlocale en_US.utf-8 en_US.utf-8
+
+gconftool-2 -s /apps/osso/inputmethod/use_finger_kb -t bool true
+#gconftool-2 -s /syste/osso/af/slide-open -t bool true
 
 cd /etc/runlevels
 for i in *; do
@@ -107,6 +116,9 @@ conf_print_sourceslist() {
 	case "$device_name" in
 	pine*)
 		devname="pinephone"
+		;;
+	raspi*)
+		devname="raspberrypi"
 		;;
 	esac
 

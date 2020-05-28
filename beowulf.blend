@@ -91,6 +91,12 @@ setlocale en_US.utf-8 en_US.utf-8
 gconftool-2 -s /apps/osso/inputmethod/use_finger_kb -t bool true
 #gconftool-2 -s /syste/osso/af/slide-open -t bool true
 
+# ntp parameters
+echo "2020-05-29 00:00:00" > /etc/fake-hwclock.data
+sed -e '/^NTPDATE_USE_NTP_CONF=/s/yes/no/' \
+	-e '/^NTPOPTIONS=/s/""/"-b"/' \
+	-i /etc/default/ntpsec-ntpdate
+
 cd /etc/runlevels
 for i in *; do
 	if [ -L "\$i" ]; then

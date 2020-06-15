@@ -10,7 +10,7 @@ n900|droid4|pine*)
 		fn build_kernel_${arch} "(override)"
 		#prebuild || zerr
 		postbuild || zerr
-		copy-root-overlay || zerr
+		#copy-root-overlay || zerr
 	}
 	;;
 esac

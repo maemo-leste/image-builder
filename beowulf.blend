@@ -6,11 +6,13 @@ codename="leste" && source "$R/../beowulf.config"
 
 case "$device_name" in
 n900|droid4|pine*)
+
+	skip_arm_device_root="yes"
+
 	build_kernel_${arch}() {
 		fn build_kernel_${arch} "(override)"
 		#prebuild || zerr
 		postbuild || zerr
-		#copy-root-overlay || zerr
 	}
 	;;
 esac

@@ -52,17 +52,6 @@ none /sys/kernel/debug debugfs defaults 0 0
 EOF
 	fi
 
-	case "$device_name" in
-	droid4)
-		cat <<EOF | sudo tee ${strapdir}/droid4-finalize >/dev/null
-#!/bin/sh
-rc-update add droid4-lcd sysinit
-sed -e 's/^LABEL=.*/LABEL=Maemo Leste/' -i /boot/boot/boot.cfg
-EOF
-		chroot-script -d droid4-finalize || zerr
-		;;
-	esac
-
 	blend_finalize || zerr
 
 	return 0

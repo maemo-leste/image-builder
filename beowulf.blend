@@ -5,7 +5,7 @@ vars+=(codename)
 codename="leste" && source "$R/../beowulf.config"
 
 case "$device_name" in
-n900|droid4|pine*)
+n900|droid4|bionic|pine*)
 
 	skip_arm_device_root="yes"
 
@@ -116,6 +116,9 @@ conf_print_sourceslist() {
 		;;
 	raspi*)
 		devname="raspberrypi"
+		;;
+	bionic)
+		devname="droid4 bionic"
 		;;
 	esac
 

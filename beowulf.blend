@@ -5,14 +5,35 @@ vars+=(codename)
 codename="leste" && source "$R/../beowulf.config"
 
 case "$device_name" in
-n900|droid4|bionic|pine*)
+n900|droid4|bionic)
 
 	skip_arm_device_root="yes"
 
 	build_kernel_${arch}() {
 		fn build_kernel_${arch} "(override)"
-		#prebuild || zerr
-		postbuild || zerr
+		#prebuild || { zerr; return 1; }
+		postbuild || { zerr; return 1; }
+	}
+	;;
+pine*)
+	skip_arm_defice_root="yes"
+	build_kernel_${arch}() {
+		fn build_kernel_${arch} "(override)"
+		copy-root-overlay || { zerr; return 1; }
+	}
+
+	blend_postinst() {
+		fn blend_postinst
+		req=(loopdevice strapdir)
+		ckreq || return 1
+
+		notice "Flashing u-boot and compiling boot.scr"
+
+		sudo dd if="$strapdir/usr/share/pine64-uboot/u-boot-sunxi-with-spl.bin" \
+			of="$loopdevice" seek=8 bs=1024 || { zerr; return 1; }
+		sudo mkimage -C none -A arm -T script \
+			-d "$strapdir/usr/share/pine64-uboot/boot.txt" \
+			"$workdir/mnt/boot/boot.scr" || { zerr; return 1; }
 	}
 	;;
 esac
@@ -29,11 +50,11 @@ wget -O maemo-keyring.deb "$maemo_keyring_url"
 dpkg -i maemo-keyring.deb
 rm -f maemo-keyring.deb
 EOF
-	chroot-script -d blend-bootstrap-setup || zerr
+	chroot-script -d blend-bootstrap-setup || { zerr; return 1; }
 }
 
-blend_postinst() {
-	fn blend_postinst
+blend_preinst() {
+	fn blend_preinst
 	req=(strapdir)
 	[[ -n "$armsdk_version" ]] && req+=(device_name)
 	ckreq || return 1
@@ -88,12 +109,12 @@ sed -e '/^NTPDATE_USE_NTP_CONF=/s/yes/no/' \
 	-e '/^NTPOPTIONS=/s/""/"-b"/' \
 	-i /etc/default/ntpsec-ntpdate
 
-cd /etc/runlevels
-for i in *; do
-	if [ -L "\$i" ]; then
-		mv "\$i" default
-	fi
-done
+#cd /etc/runlevels
+#for i in *; do
+#	if [ -L "\$i" ]; then
+#		mv "\$i" default
+#	fi
+#done
 
 apt-get update
 apt-get clean

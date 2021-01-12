@@ -6,7 +6,6 @@ codename="leste" && source "$R/../beowulf.config"
 
 case "$device_name" in
 n900|droid4|bionic)
-
 	skip_arm_device_root="yes"
 
 	build_kernel_${arch}() {
@@ -15,11 +14,12 @@ n900|droid4|bionic)
 		postbuild || { zerr; return 1; }
 	}
 	;;
+
 pine*)
 	skip_arm_defice_root="yes"
+
 	build_kernel_${arch}() {
-		fn build_kernel_${arch} "(override)"
-		copy-root-overlay || { zerr; return 1; }
+		fn build_kernel_${arch} "(noop override)"
 	}
 
 	blend_postinst() {

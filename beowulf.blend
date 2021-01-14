@@ -116,8 +116,6 @@ sed -e '/^NTPDATE_USE_NTP_CONF=/s/yes/no/' \
 #	fi
 #done
 
-rc-update add zram sysinit
-
 apt-get update
 apt-get clean
 updatedb

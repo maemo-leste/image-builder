@@ -116,6 +116,12 @@ sed -e '/^NTPDATE_USE_NTP_CONF=/s/yes/no/' \
 #	fi
 #done
 
+rc-update del mountnfs.sh sysinit || true
+for i in alsa-utils x11-common networking zzzremove-first-boot-flag; do
+	rc-update del "$i" sysinit || true
+	rc-update add "$i" default || true
+done
+
 apt-get update
 apt-get clean
 updatedb

@@ -41,6 +41,7 @@ esac
 blend_bootstrap_setup() {
 	fn blend_bootstrap_setup
 	req=(strapdir maemo_keyring_url)
+	[[ -n "$armsdk_version" ]] && req +=(device_name)
 	ckreq || return 1
 
 	cat <<EOF | sudo tee ${strapdir}/blend-bootstrap-setup >/dev/null
@@ -51,6 +52,12 @@ dpkg -i maemo-keyring.deb
 rm -f maemo-keyring.deb
 EOF
 	chroot-script -d blend-bootstrap-setup || { zerr; return 1; }
+
+	case "$device_name" in
+	droid4|bionic)
+		mkdir -p /boot/boot
+		;;
+	esac
 }
 
 blend_preinst() {

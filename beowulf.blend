@@ -55,7 +55,7 @@ EOF
 
 	case "$device_name" in
 	droid4|bionic)
-		mkdir -p /boot/boot
+		sudo mkdir -p /boot/boot
 		;;
 	esac
 }

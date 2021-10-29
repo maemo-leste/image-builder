@@ -90,6 +90,13 @@ blend_finalize() {
 	req=(strapdir)
 	ckreq || return 1
 
+	# Used for disabling screen autolock.
+	al_gconfkey="/system/osso/dsm/locks/device_autolock_enabled"
+	al_disable="false"
+	if [[ -n "$vmsdk_version" ]]; then
+		al_disable="true"
+	fi
+
 	notice "Finalizing installation"
 	cat <<EOF | sudo tee ${strapdir}/blend-finalize >/dev/null
 #!/bin/sh
@@ -107,8 +114,8 @@ apt-cache search hildon-common-strings-l10n \
 locale-gen
 setlocale en_US.utf-8 en_US.utf-8
 
-#gconftool-2 -s /apps/osso/inputmethod/use_finger_kb -t bool true
-#gconftool-2 -s /syste/osso/af/slide-open -t bool true
+# Screen autolock
+su -c 'gconftool -s ${al_gconfkey} -t bool ${al_disable}' user
 
 # ntp parameters
 echo "2020-05-29 00:00:00" > /etc/fake-hwclock.data

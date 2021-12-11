@@ -5,7 +5,7 @@ vars+=(codename)
 codename="leste" && source "$R/../beowulf.config"
 
 case "$device_name" in
-n900|droid4|bionic)
+n900|droid3|droid4|bionic)
 	skip_arm_device_root="yes"
 
 	build_kernel_${arch}() {
@@ -54,7 +54,7 @@ EOF
 	chroot-script -d blend-bootstrap-setup || { zerr; return 1; }
 
 	case "$device_name" in
-	droid4|bionic)
+	droid3|droid4|bionic)
 		sudo mkdir -p /boot/boot
 		;;
 	esac
@@ -160,6 +160,9 @@ conf_print_sourceslist() {
 		;;
 	bionic)
 		devname="droid4 bionic"
+		;;
+	droid3)
+		devname="droid4 droid3"
 		;;
 	esac
 

@@ -5,7 +5,7 @@ vars+=(codename)
 codename="leste" && source "$R/../beowulf.config"
 
 case "$device_name" in
-n900|droid3|droid4|bionic)
+n900|droid3|droid4|bionic|sunxi)
 	skip_arm_device_root="yes"
 
 	build_kernel_${arch}() {

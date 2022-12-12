@@ -1,6 +1,6 @@
 [submodule "vm-sdk"]
 	path = vm-sdk
-	url = https://github.com/parazyd/vm-sdk
+	url = https://github.com/maemo-leste/vm-sdk
 [submodule "arm-sdk"]
 	path = arm-sdk
 	url = https://github.com/maemo-leste/arm-sdk

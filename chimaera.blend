@@ -101,8 +101,8 @@ blend_finalize() {
 	cat <<EOF | sudo tee ${strapdir}/blend-finalize >/dev/null
 #!/bin/sh
 
-apt-get --yes --force-yes purge ${finalize_purge_packages}
-apt-get --yes --force-yes --purge autoremove
+apt-get --yes --allow-remove-essential purge ${finalize_purge_packages}
+apt-get --yes --allow-remove-essential --purge autoremove
 dpkg -l | awk '/^rc / {print \$2}' | xargs apt-get --yes --force-yes purge
 
 # TODO: Do this through a package when we have a language-changing package

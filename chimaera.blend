@@ -5,7 +5,14 @@ vars+=(codename)
 codename="leste" && source "$R/../chimaera.config"
 
 case "$device_name" in
-n900|droid3|droid4|bionic|sunxi)
+n900)
+	build_kernel_${arch}() {
+		fn build_kernel_${arch} "(override)"
+		#prebuild || { zerr; return 1; }
+		postbuild || { zerr; return 1; }
+	}
+	;;
+droid3|droid4|bionic|sunxi)
 	skip_arm_device_root="yes"
 
 	build_kernel_${arch}() {

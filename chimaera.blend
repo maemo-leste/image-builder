@@ -23,7 +23,7 @@ droid3|droid4|bionic|sunxi)
 	;;
 
 pine*)
-	skip_arm_defice_root="yes"
+	skip_arm_device_root="yes"
 
 	build_kernel_${arch}() {
 		fn build_kernel_${arch} "(noop override)"

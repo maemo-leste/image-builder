@@ -114,10 +114,19 @@ dpkg -l | awk '/^rc / {print \$2}' | xargs apt-get --yes --force-yes purge
 
 # TODO: Do this through a package when we have a language-changing package
 # Generate locales
-apt-cache search hildon-common-strings-l10n \
-	| grep -v mr0 \
-	| awk -F'[()]' '{printf "%s.UTF-8 UTF-8\n", \$2}' \
-	>> /etc/locale.gen
+
+if [[ "$tiny_image" = true ]]; then
+	# Let's not make all locales now (per above), instead
+	# let users re-create these later using some leste-config pkg
+	echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+	echo "en_GB.UTF-8 UTF-8" >> /etc/locale.gen
+else
+	apt-cache search hildon-common-strings-l10n \
+		| grep -v mr0 \
+		| awk -F'[()]' '{printf "%s.UTF-8 UTF-8\n", \$2}' \
+		>> /etc/locale.gen
+fi
+
 locale-gen
 setlocale en_US.utf-8 en_US.utf-8
 
@@ -145,9 +154,30 @@ done
 
 apt-get update
 apt-get clean
-updatedb
+
 update-ca-certificates
 EOF
+
+	if [[ "$tiny_image" = true ]]; then
+	cat <<EOF | sudo tee -a ${strapdir}/blend-finalize >/dev/null
+# Takes up a lot of space, let's clean it
+rm -rf /var/lib/apt/lists/*
+rm -rf /var/cache/apt/*
+
+# Aggressive cleaning, will require full-pkgs reinstall to get these files back,
+# but that's OK for our really tiny images.
+# XXX TODO: provide a script to get these packages back
+mkdir /usr/share/locale_tmp
+cp -a /usr/share/locale/en* /usr/share/locale_tmp/
+rm -rf /usr/share/locale
+mv /usr/share/locale_tmp /usr/share/locale
+rm -rf /usr/share/doc
+rm -rf /usr/share/man
+EOF
+	fi
+    # TODO: Check
+    # Check /usr/src/ for stuff like linux-headers-5.10.0-28-armmp
+
 	chroot-script -d blend-finalize || zerr
 }
 

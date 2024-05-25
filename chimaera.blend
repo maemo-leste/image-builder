@@ -61,7 +61,7 @@ EOF
 	chroot-script -d blend-bootstrap-setup || { zerr; return 1; }
 
 	case "$device_name" in
-	droid3|droid4|bionic)
+	droid3|droid4|bionic|xt910|xt912|mz617)
 		sudo mkdir -p /boot/boot
 		;;
 	esac
@@ -170,6 +170,15 @@ conf_print_sourceslist() {
 		;;
 	droid3)
 		devname="droid4 droid3"
+		;;
+	xt910)
+		devname="droid4 razr"
+		;;
+	xt912)
+		devname="droid4 razr"
+		;;
+	mz617)
+		devname="droid4 xyboard"
 		;;
 	esac
 

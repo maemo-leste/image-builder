@@ -134,7 +134,7 @@ setlocale en_US.utf-8 en_US.utf-8
 su -c 'gconftool -s ${al_gconfkey} -t bool ${al_disable}' user
 
 # ntp parameters
-echo "2020-05-29 00:00:00" > /etc/fake-hwclock.data
+echo "2024-05-25 00:00:00" > /etc/fake-hwclock.data
 sed -e '/^NTPDATE_USE_NTP_CONF=/s/yes/no/' \
 	-e '/^NTPOPTIONS=/s/""/"-b -4"/' \
 	-i /etc/default/ntpsec-ntpdate

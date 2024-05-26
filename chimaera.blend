@@ -114,19 +114,25 @@ dpkg -l | awk '/^rc / {print \$2}' | xargs apt-get --yes --force-yes purge
 
 # TODO: Do this through a package when we have a language-changing package
 # Generate locales
+EOF
 
 if [[ "$tiny_image" = true ]]; then
+	cat <<EOF | sudo tee -a ${strapdir}/blend-finalize >/dev/null
 	# Let's not make all locales now (per above), instead
 	# let users re-create these later using some leste-config pkg
 	echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 	echo "en_GB.UTF-8 UTF-8" >> /etc/locale.gen
+EOF
 else
+	cat <<EOF | sudo tee -a ${strapdir}/blend-finalize >/dev/null
 	apt-cache search hildon-common-strings-l10n \
 		| grep -v mr0 \
 		| awk -F'[()]' '{printf "%s.UTF-8 UTF-8\n", \$2}' \
 		>> /etc/locale.gen
+EOF
 fi
 
+cat <<EOF | sudo tee -a ${strapdir}/blend-finalize >/dev/null
 locale-gen
 setlocale en_US.utf-8 en_US.utf-8
 

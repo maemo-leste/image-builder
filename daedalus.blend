@@ -1,0 +1,234 @@
+#!/usr/bin/env zsh
+# See LICENSE file for copyright and license details
+
+vars+=(codename)
+codename="leste" && source "$R/../daedalus.config"
+
+case "$device_name" in
+n900)
+	build_kernel_${arch}() {
+		fn build_kernel_${arch} "(override)"
+		#prebuild || { zerr; return 1; }
+		postbuild || { zerr; return 1; }
+	}
+	;;
+droid3|droid4|bionic|sunxi)
+	skip_arm_device_root="yes"
+
+	build_kernel_${arch}() {
+		fn build_kernel_${arch} "(override)"
+		#prebuild || { zerr; return 1; }
+		postbuild || { zerr; return 1; }
+	}
+	;;
+
+pine*)
+	skip_arm_device_root="yes"
+
+	build_kernel_${arch}() {
+		fn build_kernel_${arch} "(noop override)"
+	}
+
+	blend_postinst() {
+		fn blend_postinst
+		req=(loopdevice strapdir)
+		ckreq || return 1
+
+		notice "Flashing u-boot and compiling boot.scr"
+
+		sudo dd if="$strapdir/usr/share/pine64-uboot/u-boot-sunxi-with-spl.bin" \
+			of="$loopdevice" seek=8 bs=1024 || { zerr; return 1; }
+		sudo mkimage -C none -A arm -T script \
+			-d "$strapdir/usr/share/pine64-uboot/boot.txt" \
+			"$workdir/mnt/boot/boot.scr" || { zerr; return 1; }
+	}
+	;;
+esac
+
+blend_bootstrap_setup() {
+	fn blend_bootstrap_setup
+	req=(strapdir maemo_keyring_url)
+	[[ -n "$armsdk_version" ]] && req +=(device_name)
+	ckreq || return 1
+
+	cat <<EOF | sudo tee ${strapdir}/blend-bootstrap-setup >/dev/null
+#!/bin/sh
+set -e
+wget -O maemo-keyring.deb "$maemo_keyring_url"
+dpkg -i maemo-keyring.deb
+rm -f maemo-keyring.deb
+EOF
+	chroot-script -d blend-bootstrap-setup || { zerr; return 1; }
+
+	case "$device_name" in
+	droid3|droid4|bionic|xt910|xt912|mz617)
+		sudo mkdir -p /boot/boot
+		;;
+	esac
+}
+
+blend_preinst() {
+	fn blend_preinst
+	req=(strapdir)
+	[[ -n "$armsdk_version" ]] && req+=(device_name)
+	ckreq || return 1
+
+	notice "copying rootfs overlays"
+	sudo rsync -vraX --chown=root:root "$R/../rootfs-overlay/common/" "${strapdir}"
+
+	if [[ -n "$armsdk_version" ]]; then
+		sudo rsync -vraX --chown=root:root "$R/../rootfs-overlay/${device_name}/" "${strapdir}"
+		echo "devuan-${device_name}" | sudo tee "$strapdir/etc/hostname" >/dev/null
+		sudo sed -e "s/devuan/devuan-${device_name}/" -i "$strapdir/etc/hosts"
+		cat <<EOF | sudo tee "$strapdir/etc/fstab" >/dev/null
+# fstab for arm system
+none /sys/kernel/debug debugfs defaults 0 0
+/dev/mmcblk0p1 /boot ${bootfs} defaults 0 1
+EOF
+	fi
+
+	blend_finalize || zerr
+
+	return 0
+}
+
+blend_finalize() {
+	fn blend_finalize
+	req=(strapdir)
+	ckreq || return 1
+
+	# Used for disabling screen autolock.
+	al_gconfkey="/system/osso/dsm/locks/device_autolock_enabled"
+	al_disable="false"
+	if [[ -n "$vmsdk_version" ]]; then
+		al_disable="true"
+	fi
+
+	notice "Finalizing installation"
+	cat <<EOF | sudo tee ${strapdir}/blend-finalize >/dev/null
+#!/bin/sh
+
+apt-get --yes --allow-remove-essential purge ${finalize_purge_packages}
+apt-get --yes --allow-remove-essential --purge autoremove
+dpkg -l | awk '/^rc / {print \$2}' | xargs apt-get --yes --force-yes purge
+
+# TODO: Do this through a package when we have a language-changing package
+# Generate locales
+EOF
+
+if [[ "$tiny_image" = true ]]; then
+	cat <<EOF | sudo tee -a ${strapdir}/blend-finalize >/dev/null
+	# Let's not make all locales now (per above), instead
+	# let users re-create these later using some leste-config pkg
+	echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+	echo "en_GB.UTF-8 UTF-8" >> /etc/locale.gen
+EOF
+else
+	cat <<EOF | sudo tee -a ${strapdir}/blend-finalize >/dev/null
+	apt-cache search hildon-common-strings-l10n \
+		| grep -v mr0 \
+		| awk -F'[()]' '{printf "%s.UTF-8 UTF-8\n", \$2}' \
+		>> /etc/locale.gen
+EOF
+fi
+
+cat <<EOF | sudo tee -a ${strapdir}/blend-finalize >/dev/null
+locale-gen
+setlocale en_US.utf-8 en_US.utf-8
+
+# Screen autolock
+su -c 'gconftool -s ${al_gconfkey} -t bool ${al_disable}' user
+
+# ntp parameters
+echo "2024-05-25 00:00:00" > /etc/fake-hwclock.data
+sed -e '/^NTPDATE_USE_NTP_CONF=/s/yes/no/' \
+	-e '/^NTPOPTIONS=/s/""/"-b -4"/' \
+	-i /etc/default/ntpsec-ntpdate
+
+#cd /etc/runlevels
+#for i in *; do
+#	if [ -L "\$i" ]; then
+#		mv "\$i" default
+#	fi
+#done
+
+rc-update del mountnfs.sh sysinit || true
+for i in alsa-utils x11-common networking zzzremove-first-boot-flag; do
+	rc-update del "$i" sysinit || true
+	rc-update add "$i" default || true
+done
+
+apt-get update
+apt-get clean
+
+update-ca-certificates
+EOF
+
+	if [[ "$tiny_image" = true ]]; then
+	cat <<EOF | sudo tee -a ${strapdir}/blend-finalize >/dev/null
+# Takes up a lot of space, let's clean it
+rm -rf /var/lib/apt/lists/*
+rm -rf /var/cache/apt/*
+
+# Aggressive cleaning, will require full-pkgs reinstall to get these files back,
+# but that's OK for our really tiny images.
+# XXX TODO: provide a script to get these packages back
+mkdir /usr/share/locale_tmp
+cp -a /usr/share/locale/en* /usr/share/locale_tmp/
+rm -rf /usr/share/locale
+mv /usr/share/locale_tmp /usr/share/locale
+rm -rf /usr/share/doc
+rm -rf /usr/share/man
+EOF
+	fi
+    # TODO: Check
+    # Check /usr/src/ for stuff like linux-headers-5.10.0-28-armmp
+
+	chroot-script -d blend-finalize || zerr
+}
+
+conf_print_sourceslist() {
+	fn conf_print_sourceslist "(override)"
+	req=(codename)
+	[[ -n "$armsdk_version" ]] && req+=(device_name)
+	ckreq || return 1
+
+	devname="$device_name"
+	case "$device_name" in
+	pine*)
+		devname="pinephone"
+		;;
+	raspi*)
+		devname="raspberrypi"
+		;;
+	bionic)
+		devname="droid4 bionic"
+		;;
+	droid3)
+		devname="droid4 droid3"
+		;;
+	xt910)
+		devname="droid4 razr"
+		;;
+	xt912)
+		devname="droid4 razr"
+		;;
+	mz617)
+		devname="droid4 xyboard"
+		;;
+	esac
+
+	cat <<EOF
+deb https://pkgmaster.devuan.org/merged ${release} main contrib non-free
+deb https://pkgmaster.devuan.org/merged ${release}-updates main contrib non-free
+deb https://pkgmaster.devuan.org/merged ${release}-security main contrib non-free
+
+deb https://maedevu.maemo.org/${codename} ${release} main contrib non-free ${lima} ${devname}
+EOF
+
+	if [[ "$devel_image" = true ]]; then
+		cat <<EOF
+deb https://maedevu.maemo.org/${codename} ${release}-devel main contrib non-free ${lima} ${devname}
+EOF
+	fi
+}

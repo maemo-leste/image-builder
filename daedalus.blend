@@ -219,9 +219,9 @@ conf_print_sourceslist() {
 	esac
 
 	cat <<EOF
-deb https://pkgmaster.devuan.org/merged ${release} main contrib non-free
-deb https://pkgmaster.devuan.org/merged ${release}-updates main contrib non-free
-deb https://pkgmaster.devuan.org/merged ${release}-security main contrib non-free
+deb https://pkgmaster.devuan.org/merged ${release} main contrib non-free non-free-firmware
+deb https://pkgmaster.devuan.org/merged ${release}-updates main contrib non-free non-free-firmware
+deb https://pkgmaster.devuan.org/merged ${release}-security main contrib non-free non-free-firmware
 
 deb https://maedevu.maemo.org/${codename} ${release} main contrib non-free ${lima} ${devname}
 EOF
